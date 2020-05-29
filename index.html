@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>7777</title>
+		<script src="js/jquery-3.4.1.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.bootcdn.net/ajax/libs/html2canvas/0.5.0-beta3/html2canvas.js"></script>
+		<script src="https://cdn.bootcdn.net/ajax/libs/jspdf/1.5.2/jspdf.debug.js"></script>
+	</head>
+	<body>
+		666
+		<script type="text/javascript">
+			$(function(){
+				/*复制元素，注意ID*/
+				$("body").append('<div id="pdf1">…………………………………………………………</div>');
+				/*设置新元素样式*/
+				 $("#pdf1").css({
+				    "background-color": "#fff",
+				    "position": "absolute",
+				    "top": "0px",
+				    "z-index": "-1",
+				    "height": $("#pdf").height()
+				});
+				
+				
+				/*html2canvas生成图片，jspdf生成PDF文件*/
+				html2canvas($("#pdf1"), {
+				    background: "#fff",
+				    allowTaint: true,
+				    taintTest: false,
+				    onrendered:function(canvas) {
+				        var contentWidth = canvas.width;
+				        var contentHeight = canvas.height;
+				        var pageHeight = contentWidth / 592.28 * 841.89;
+				        var leftHeight = contentHeight;
+				        var position = 0;
+				        var imgWidth = 595.28;
+				        var imgHeight = 592.28/contentWidth * contentHeight;
+				        var pageData = canvas.toDataURL('image/jpeg', 1.0);
+				        var img = new Image();
+				        img.src = pageData;
+				        var pdf = new jsPDF('p', 'pt', 'a4');
+				        img.onload = function() {
+				            if (leftHeight < pageHeight) {
+				                pdf.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight );
+				            } else {
+				                while(leftHeight > 0) {
+				                    pdf.addImage(pageData, 'JPEG', 0, position, imgWidth, imgHeight)
+				                    leftHeight -= pageHeight;
+				                    position -= 841.89;
+				                    if(leftHeight > 0) {
+				                        pdf.addPage();
+				                    }
+				                }
+				            }
+				            pdf.save('report_pdf_' + new Date().getTime() + '.pdf');
+				            $("#pdf1").remove();
+				        }
+				    },
+				})
+			})
+			
+		</script>
+	</body>
+</html>
